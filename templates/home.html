@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block sidepanel %}
+{% include 'sidepanel.html'%}
+{% endblock sidepanel %}
+{% load static %}
+    {% block content %}
+        <div class="container" style="text-align: center; padding-top: 10%;">
+            <h1>
+                Django Social Login
+            </h1>
+            <br /><br />
+            {% if user.is_authenticated %}
+                <h3>
+                    Welcome {{ user.username }} !!!
+                </h3>
+                <br /><br />
+                <a href="{% url 'account_logout' %}" class="btn btn-danger">
+                    Logout
+                </a>
+            {% endif %}
+        </div>
+    {% endblock content %}
+    {% block staticjs %}
+        <script>
+            var last_clicked ;
+            var div = document.getElementById("createTaskForm");
+            var div1 = document.getElementById("pendingTaskForm");
+            $("#createTask").click(function(){
+                if (div.style.display === "none") 
+                {
+                    div.style.display = "block";
+                    last_clicked = div;
+                }
+                else 
+                {
+                    div.style.display = "none";
+                }
+            })
+            $("#pendingTask").click(function(){
+                if (div1.style.display === "none") 
+                {
+                    last_clicked.style.display = "none";
+                    div1.style.display = "block";
+                    last_clicked = div1;
+                } 
+                else 
+                {
+                    div1.style.display = "none";
+                }
+            })
+        </script>
+    {% endblock staticjs %}

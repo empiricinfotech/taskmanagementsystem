@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block sidepanel %}
+    {% include 'sidepanel.html'%}
+{% endblock sidepanel %}
+{% block content %}
+    <div class="flex flex-col flex-wrap h-screen w-full rounded-lg">
+        <div class="m-3 p-4 text-light bg-dark rounded-lg h-screen">
+            <div id="toastContainer" class="fixed top-12 right-8 w-96 z-50"></div>
+            <script>
+              function displayToast(message) {
+                const toastContainer = document.getElementById('toastContainer');
+
+                const toast = document.createElement('div');
+                toast.className = 'bg-green-500 text-white py-2 px-4 rounded-md shadow';
+                toast.innerText = message;
+
+                toastContainer.appendChild(toast);
+
+                setTimeout(() => {
+                  toast.remove();
+                }, 2000);
+              }
+
+              function displayErrorToast(message) {
+                const toastContainer = document.getElementById('toastContainer');
+
+                const toast = document.createElement('div');
+                toast.className = 'bg-red-500 text-white py-2 px-4 rounded-md shadow';
+                toast.innerText = message;
+
+                toastContainer.appendChild(toast);
+
+                setTimeout(() => {
+                  toast.remove();
+                }, 3000);
+              }
+            </script>
+            {% if  Success  %}
+              <script>
+                displayToast("Profile Updated Successfully.");
+              </script>
+            {% endif %}
+            {% if error %}
+                <script>
+                    displayErrorToast("Can't Update Profile.");
+                </script>
+            {% endif %}
+            <div class="bg-slate-700 rounded-lg h-full ">
+                <div class="p-4">
+                    <label class="text-6xl m-3 border-double border-b-4 pb-3">Profile</label>
+                </div>
+                <div class="ml-16">
+                    <form method="POST" action="{% url 'profile' %}">
+                        {% csrf_token %}
+                        <label class="p-6 text-xl">
+                            UserName :
+                        </label>
+                        {% if user.username %}
+                            <input class="rounded p-2 mb-2 text-black   " type="text" name="username" value="{{user.username}}"><br>
+                        {% else %}
+                            <input class="rounded p-2 mb-2 text-black " type="text" name="username" value="{{username}}"><br>
+                        {% endif %}
+                        <label class="p-6 text-xl">Email :</label>   
+                        {% if user.email %}
+                            <input class="rounded p-2 ml-12 mb-2 text-black " type="text" name="email" value="{{user.email}}"><br>
+                        {% else %}
+                            <input class="rounded p-2 ml-8 mb-2 text-black " type="text" name="email" value="{{email}}"><br>
+                        {% endif %}
+                        <button class="rounded p-2 px-4 mb-4 bg-blue-700 ml-48 text-xl"type="submit">submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

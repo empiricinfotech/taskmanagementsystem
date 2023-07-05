@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block sidepanel %}
+{% include 'sidepanel.html'%}
+{% endblock sidepanel %}
+{% load static %}
+	
+{% block content %}
+	{% for message in messages %}
+		<h3 class="text-2xl text-red-600"> 
+			{{ message }}
+		</h3>
+  	{% endfor %}
+	<p class="text-lg text-center">
+		Create Task 
+	</p>
+    <form method="POST" enctype="multipart/form-data" class="ml-10">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+		<button class="p-2 mt-2 text-white bg-gray-800 hover:bg-gray-900 rounded-lg" type='submit'>
+			Submit
+		</button>	
+    </form>
+		
+{% endblock content %}
+{% block staticjs %}
+{% endblock staticjs %}
+		

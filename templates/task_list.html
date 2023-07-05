@@ -1,0 +1,647 @@
+{% extends "base.html" %}
+{% include 'messages.html' %}
+{% block sidepanel %}
+{% include 'sidepanel.html'%}
+{% endblock sidepanel %}
+{% load static %}
+{% block content %}
+    <div id="toastContainer" class="fixed top-8 right-4 z-50  text-xl h-8 w-96"></div>
+    <div class="flex flex-col flex-wrap w-full rounded-lg h-screen">
+        <div class=" m-3 p-4 text-light  bg-dark rounded-lg h-screen">
+            <div class="bg-slate-700 rounded-lg  h-full">
+                <div class="p-4">
+                    <div class="p-8">
+                        <button id="createTask" data-modal-target="large-modal" data-modal-toggle="large-modal" class="block w-full md:w-auto text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-orange-500 dark:hover:bg-orange-600 dark:focus:ring-orange-600" type="button"> 
+                            + New Task 
+                        </button>
+                    </div>
+                    <div class="">
+                        <form method="POST" name="filter_form" >
+                            {% csrf_token %}
+                            <span class="p-8">
+                                <input class="p-2 text-black rounded-lg" type="text" value="" id="searchIn"name="searchIn" placeholder="Search" required/>
+                                <button class="bg-orange-500 rounded-lg px-4 text-lg p-2">
+                                    search
+                                </button>
+                            </span>
+                        </form>
+                    </div>
+                </div>
+                <div class="m-4 p-8">
+                    <div class="text-white">
+                        <table class="table  ">
+                            <thead>
+                                <tr class="text-left">
+                                    <th class='p-2 text-white text-xl' scope="col">Task Title</th>
+                                    <th class='p-2 px-7 text-white text-xl' scope="col">Created By</th>
+                                    <th class='p-2 px-7 text-white text-xl' scope="col">Assign To</th>
+                                    <th class='p-2 px-7 text-white text-xl' scope="col">Created</th>
+                                    <th class='p-2 px-7 text-white text-xl' scope="col">Priority</th>
+                                    <th class='p-2 px-7 text-white text-xl' scope="col">Status</th>
+                                    <th class='p-2 px-7 text-white text-xl' scope="col">Progress</th>
+                                    <th/>   
+                                </tr>
+                            </thead>
+                            <tbody class="">
+                                {% if flag.count is 0 %}
+                                <tr class="">
+                                    <td colspan="7" class="text-center text-xl text-white p-4 "> 
+                                        No data Found
+                                    </td>
+                                </tr>
+                                {% else %}
+                                    {% for i in page_obj.object_list %}
+                                        <tr>
+                                            <td class='p-2 text-white '>
+                                                <button id="{{i.id}}" class="">
+                                                    <a href="{% url 'display_task' i.id %}">
+                                                        <span class="text-lg">{{i.task_title}}</span>
+                                                    </a>
+                                                </button>
+                                            </td>
+                                            <td class='p-2 px-7 text-white text-lg '>
+                                                {{i.created_By}}
+                                            </td>
+                                            <td class='p-2 px-7 text-white text-lg'>
+                                                <span id="span_assign_To_{{i.id}}">
+                                                    {{i.assign_To}}
+                                                </span>
+                                                <select id="assign_To_{{i.id}}" name="assign_To" class="hidden text-black p-2 px-7 rounded-lg" >
+                                                    <option value="None">None</option>
+                                                    {% for j in users %}
+                                                        {% if j == i.assign_To %}
+                                                            <option value="{{j}}" selected>{{j}}</option> 
+                                                        {% else %}
+                                                            <option value="{{j}}">{{j}}</option>
+                                                        {% endif %} 
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                            <td class='p-2 px-7 text-white text-lg'>
+                                                {{i.startDate}}
+                                            </td>
+                                            <td class='p-2 px-12 '>
+                                                <select id="priority_{{i.id}}" name="priority" class="p-2 px-12 rounded-lg"disabled>
+                                                    {% if i.priority == 'Highest'  %}
+                                                        <option value="Highest" selected>
+                                                            Highest
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="Highest" >
+                                                            Highest
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.priority == 'High'  %}
+                                                        <option value="High" selected>
+                                                            High
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="High" >
+                                                            High
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.priority == 'Medium'  %}
+                                                        <option value="Medium" selected>
+                                                            Medium
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="Medium" >
+                                                            Medium
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.priority == 'Low'  %}
+                                                        <option value="Low" selected>
+                                                            Low
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="Low">
+                                                            Low
+                                                        </option>
+                                                    {% endif %}
+                                                </select>
+                                            </td>
+                                            <td class='p-2 px-12 '>
+                                               <select id="status_{{i.id}}" name="status" class="p-2 px-12 rounded-lg" disabled>
+                                                    {% if i.status == 'Open'  %}
+                                                        <option value="Open" selected>
+                                                            Open
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="Open">
+                                                            Open
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.status == 'Done'  %}
+                                                        <option value="Done" selected>
+                                                            Done
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="Done" >
+                                                            Done
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.status == 'Pending'  %}
+                                                        <option value="Pending" selected>
+                                                            Pending
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="Pending" >
+                                                            Pending
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.status == 'InProgress'  %}
+                                                        <option value="InProgress" selected>
+                                                            InProgress
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="InProgress" >
+                                                            InProgress
+                                                        </option>
+                                                    {% endif %}
+                                                </select>
+                                            </td>
+                                            <td class='p-2 px-7 '>
+                                                <select id="progress_{{i.id}}" name="progress" class="p-2 px-7 rounded-lg" disabled>
+                                                    {% if i.progress == '0%'  %}
+                                                        <option value="0%" selected>
+                                                            0%
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="0%" >
+                                                            0%
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.progress == '10%'  %}
+                                                        <option value="10%" selected>
+                                                            10%
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="10%" >
+                                                            10%
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.progress == '20%'  %}
+                                                        <option value="20%" selected>
+                                                            20%
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="20%" >
+                                                            20%
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.progress == '30%'  %}
+                                                        <option value="30%" selected>
+                                                            30%
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="30%" >
+                                                            30%
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.progress == '40%'  %}
+                                                        <option value="40%" selected>
+                                                            40%
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="40%" >
+                                                            40%
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.progress == '50%'  %}
+                                                        <option value="50%" selected>
+                                                            50%
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="50%" >
+                                                            50%
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.progress == '60%'  %}
+                                                        <option value="60%" selected>
+                                                            60%
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="60%" >
+                                                            60%
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.progress == '70%'  %}
+                                                        <option value="70%" selected>
+                                                            70%
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="70%" >
+                                                            70%
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.progress == '80%'  %}
+                                                        <option value="80%" selected>
+                                                            80%
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="80%" >
+                                                            80%
+                                                        </option>
+                                                    {% endif %}
+                                                    {% if i.progress == '90%'  %}
+                                                        <option value="90%" selected>
+                                                            90%
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="90%" >
+                                                            90%
+                                                        </option>
+                                                    {% endif %}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <button id='update_pen{{i.id}}' onclick='datachange({{i.id}})' class='hover:bg-gray-400 items-center p-2 h-10 w-10 rounded-full text-white'>
+                                                    <i class="fa-solid fa-pen text-black-400"></i>
+                                                </button>
+                                                <button id='edit_data{{i.id}}' onclick='postchange({{i.id}})' class='hidden hover:bg-gray-400 items-center p-2 h-10 w-10 rounded-full text-white' >
+                                                    <i class="fa-solid fa-check text-black-400"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {%endfor%}
+                                {%endif%}
+                            </tbody>
+
+                            {%if createdTask%}
+                            <tbody>
+                                {% for i in page_obj.object_list%}
+                                    <tr>
+                                        <td class='p-2 text-white '>
+                                            <button id="{{i.id}}" class="">
+                                                {{i.task_title}}
+                                            </button>
+                                        </td>
+                                        <td class='p-2 px-7 text-white text-lg '>
+                                            {{i.created_By}}
+                                        </td>
+                                        <td class='p-2 px-7 text-white text-lg'>
+                                            <span id="span_assign_To_{{i.id}}">
+                                                {{i.assign_To}}
+                                            </span>
+                                            <select id="assign_To_{{i.id}}" name="assign_To" class="hidden text-black p-2 px-7 rounded-lg" >
+                                                {% for j in users %}
+                                                    {% if j == i.assign_To %}
+                                                        <option value="{{j}}" selected>{{j}}</option> 
+                                                    {% else %}
+                                                        <option value="{{j}}">{{j}}</option>
+                                                    {% endif %} 
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td class='p-2 px-7 text-white text-lg'>
+                                            {{i.startDate}}
+                                        </td>
+                                        <td class='p-2 px-12 '>
+                                            <select id="priority_{{i.id}}" name="priority" class="p-2 px-12 rounded-lg"disabled>
+                                                {% if i.priority == 'Highest'  %}
+                                                    <option value="Highest" selected>
+                                                        Highest
+                                                    </option>
+                                                {% else %}
+                                                    <option value="Highest" >
+                                                        Highest
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.priority == 'High'  %}
+                                                    <option value="High" selected>
+                                                        High
+                                                    </option>
+                                                {% else %}
+                                                    <option value="High" >
+                                                        High
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.priority == 'Medium'  %}
+                                                    <option value="Medium" selected>
+                                                        Medium
+                                                    </option>
+                                                {% else %}
+                                                    <option value="Medium" >
+                                                        Medium
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.priority == 'Low'  %}
+                                                    <option value="Low" selected>
+                                                        Low
+                                                    </option>
+                                                {% else %}
+                                                    <option value="Low">
+                                                        Low
+                                                    </option>
+                                                {% endif %}
+                                            </select>
+                                        </td>
+                                        <td class='p-2 px-12 '>
+                                           <select id="status_{{i.id}}" name="status" class="p-2 px-12 rounded-lg" disabled>
+                                                {% if i.status == 'Open'  %}
+                                                    <option value="Open" selected>
+                                                        Open
+                                                    </option>
+                                                {% else %}
+                                                    <option value="Open">
+                                                        Open
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.status == 'Done'  %}
+                                                    <option value="Done" selected>
+                                                        Done
+                                                    </option>
+                                                {% else %}
+                                                    <option value="Done" >
+                                                        Done
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.status == 'Pending'  %}
+                                                    <option value="Pending" selected>
+                                                        Pending
+                                                    </option>
+                                                {% else %}
+                                                    <option value="Pending" >
+                                                        Pending
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.status == 'InProgress'  %}
+                                                    <option value="InProgress" selected>
+                                                        InProgress
+                                                    </option>
+                                                {% else %}
+                                                    <option value="InProgress" >
+                                                        InProgress
+                                                    </option>
+                                                {% endif %}
+                                            </select>
+                                        </td>
+                                        <td class='p-2 px-7 '>
+                                            <select id="progress_{{i.id}}" name="progress" class="p-2 px-7 rounded-lg" disabled>
+                                                {% if i.progress == '0%'  %}
+                                                    <option value="0%" selected>
+                                                        0%
+                                                    </option>
+                                                {% else %}
+                                                    <option value="0%" >
+                                                        0%
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.progress == '10%'  %}
+                                                    <option value="10%" selected>
+                                                        10%
+                                                    </option>
+                                                {% else %}
+                                                    <option value="10%" >
+                                                        10%
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.progress == '20%'  %}
+                                                    <option value="20%" selected>
+                                                        20%
+                                                    </option>
+                                                {% else %}
+                                                    <option value="20%" >
+                                                        20%
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.progress == '30%'  %}
+                                                    <option value="30%" selected>
+                                                        30%
+                                                    </option>
+                                                {% else %}
+                                                    <option value="30%" >
+                                                        30%
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.progress == '40%'  %}
+                                                    <option value="40%" selected>
+                                                        40%
+                                                    </option>
+                                                {% else %}
+                                                    <option value="40%" >
+                                                        40%
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.progress == '50%'  %}
+                                                    <option value="50%" selected>
+                                                        50%
+                                                    </option>
+                                                {% else %}
+                                                    <option value="50%" >
+                                                        50%
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.progress == '60%'  %}
+                                                    <option value="60%" selected>
+                                                        60%
+                                                    </option>
+                                                {% else %}
+                                                    <option value="60%" >
+                                                        60%
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.progress == '70%'  %}
+                                                    <option value="70%" selected>
+                                                        70%
+                                                    </option>
+                                                {% else %}
+                                                    <option value="70%" >
+                                                        70%
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.progress == '80%'  %}
+                                                    <option value="80%" selected>
+                                                        80%
+                                                    </option>
+                                                {% else %}
+                                                    <option value="80%" >
+                                                        80%
+                                                    </option>
+                                                {% endif %}
+                                                {% if i.progress == '90%'  %}
+                                                    <option value="90%" selected>
+                                                        90%
+                                                    </option>
+                                                {% else %}
+                                                    <option value="90%" >
+                                                        90%
+                                                    </option>
+                                                {% endif %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button id='update_pen{{i.id}}' onclick='datachange({{i.id}})' class='hover:bg-gray-400 items-center p-2 h-10 w-10 rounded-full text-white'>
+                                                <i class="fa-solid fa-pen text-black-400"></i>
+                                            </button>
+                                            <button id='edit_data{{i.id}}' onclick='postchange({{i.id}})' class='hidden hover:bg-gray-400 items-center p-2 h-10 w-10 rounded-full text-white' >
+                                                <i class="fa-solid fa-check text-black-400"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {%endfor%}
+                            </tbody>
+                            {%endif%}
+                        </table>
+                    </div>
+                </div>  
+                {% if flag.count is 0 %}
+                {%else%}
+                <center class="p-4">
+                    <span>
+                      {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}">
+                            Previous
+                        </a>
+                      {% endif %}
+                      <span>
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                      </span>
+                      {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">
+                            Next
+                        </a>
+                      {% endif %}
+                    </span>
+                </center> 
+                {%endif%}     
+                <!-- Large Modal -->
+                <div id="large-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[cal(100%-1rem)] max-h-full">
+                    <div class="relative w-full max-w-4xl max-h-full">
+                        <!-- Modal content -->
+                        <div class="relative bg-gray rounded-lg shadow dark:bg-gray-700">
+                            <!-- Modal header -->
+                            <div class="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
+                                <h3 class="text-3xl text-gray-900 dark:text-white">
+                                   New Task
+                                </h3>
+                                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="large-modal">
+                                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd">
+                                        </path>
+                                    </svg>
+                                    <span class="sr-only">
+                                        Close modal
+                                    </span>
+                                </button>
+                            </div>
+                            <!-- Modal body -->
+                            <form id="createTaskForm" >
+                                {% csrf_token %}
+                                <div class="p-6 space-y-6">
+                                    <div>
+                                        <label for="task_title" class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                                            Task Title
+                                        </label>
+                                        <input type="text" name="task_title" id="task_title" class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="Task title" required>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                                            Assign To
+                                        </label>
+                                        <select id="assign_To" name="assign_To" class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" >
+                                            <option value="None">None</option>
+                                            {% for j in users %}
+                                                <option value="{{j}}">
+                                                    {{j}}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                                            Start Date
+                                        </label>
+                                        <input type="date" id="startdate" name="startdate" class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                                            End Date
+                                        </label>
+                                        <input type="date" id="enddate" name="enddate" class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"required>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                                            Status
+                                        </label>
+                                        <select id="status_choice" name="status_choice" class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" >
+                                            {% for i,j in status_choice %}
+                                                <option value="{{j}}">
+                                                    {{j}}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                                            Progress
+                                        </label>
+                                        <select id="progress_choice" name="progress_choice" class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" >
+                                            {% for i,j in progress_choice %}
+                                                <option value="{{j}}">
+                                                    {{j}}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                                            Priority
+                                        </label>
+                                        <select id="priorities" name="priorities" class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" >
+                                            {% for i,j in priorities %}
+                                                <option value="{{j}}">
+                                                    {{j}}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                                            Dependency
+                                        </label>
+                                        <select id="tasksdepn" name="tasksdepn" class="h-20 mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" multiple="multiple">
+                                            {% for i in tasks %}
+                                                <option value="{{i.id}}">
+                                                    {{i.task_title}}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                                            Task Image
+                                        </label>
+                                        <input class="mb-2 block w-full text-lg text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file" name="upload[]" multiple>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white" required>
+                                            Description
+                                        </label>
+                                        <input type="text" value="" id="Desc" name="Desc" class=" mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" />
+                                    </div>
+                                </div>
+                                <!-- Modal footer -->
+                                <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                                    <button data-modal-hide="large-modal" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" id="postData">
+                                        Submit
+                                    </button>
+                                    <button data-modal-hide="large-modal"  class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600" type="reset" >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+        
+          
+{% endblock content %}
+{% block staticjs %}
+    <script src="{% static 'js/editTask.js' %}" type="text/javascript"></script>
+{% endblock staticjs %}

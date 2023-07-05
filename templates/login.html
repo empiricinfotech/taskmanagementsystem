@@ -1,0 +1,90 @@
+{% extends "base.html" %} 
+{% load socialaccount %}
+{% load static %}
+{% providers_media_js %}
+{% block content %}
+  <div id="toastContainer" class="fixed top-4 right-5 w-96 z-50"></div>
+  <script>
+    function displayErrorToast(message) {
+      const toastContainer = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'bg-red-500 text-white py-2 px-4 rounded-md shadow';
+      toast.innerText = message;
+      toastContainer.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 5000);
+    }
+  </script>
+  {% if  not_found  %}
+    <script>
+      displayErrorToast("Invalid login Credentials");
+      console.log("invalid")
+    </script>
+  {% endif %}
+  <div class="flex flex-col justify-content-center align-items-center mt-36">
+    <div class="card p-4 text-light bg-dark mb-5">
+      <div class="">
+          <i class="fa-brands fa-medium text-8xl"></i>
+      </div>
+      <div class=" ">
+          <h6 class="text-4xl m-3">Login</h6>
+      </div>
+      <div class="m-12">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="flex">
+            <div class="flex flex-col">
+              <label class="text-xl ">
+                User Name/Email: 
+              </label>
+              <input type="text" name="username" value="" class="p-2 w-96 mt-2 rounded text-black">
+            </div>
+            <div class="flex flex-col">
+              <label class="text-xl ml-3">
+                Password :  
+              </label>
+              <input type="password" name="password" value="" class="p-2 rounded w-96 mt-2 ml-3 text-black">
+            </div>
+          </div>
+          <div class="text-center m-4">
+            <button class="w-full bg-blue-500 hover:bg-blue-600 text-gray-100 font-semibold py-2 px-4 py-3 hover:border-blue-700 rounded w-80 text-lg">
+                Log in to your Account
+            </button>
+          </div>
+          <div class="flex w-full text-justify">
+            <div class="text-lg text-left w-full">
+                  Don’t have an account yet? 
+                  <a href="{% url 'signup' %}" class="text-xl" >
+                    signup
+                  </a>
+            </div>
+            <div class="text-end w-30 text-lg">
+              <a href="{% url 'forgotpassword' %}" >
+                forgotpassword
+              </a>
+            </div>
+          </div>
+        </form>   
+      </div>
+      <div class="flex justify-center space-x-8">
+        <a href="{% provider_login_url 'google' %}" class="hover:text-stone-400">
+          <i class="fa-brands fa-google fa-2xl"></i>
+        </a>
+        <a href="{% provider_login_url 'github' %}" class="hover:text-stone-400">
+          <i class="fa-brands fa-github fa-2xl"></i>
+        </a>
+        <a href="{% provider_login_url 'linkedin_oauth2' %}" class="hover:text-stone-400">
+          <i class="fa-brands fa-linkedin fa-2xl"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+
+
+
+
+
+

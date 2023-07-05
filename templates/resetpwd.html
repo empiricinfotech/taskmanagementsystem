@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% if requesr.user.is_authenticated %}
+  {% block sidepanel %}
+    {% include 'sidepanel.html'%}
+  {% endblock sidepanel %}
+{% endif %}
+    {% block content %}
+    <div id="toastContainer" class="fixed top-8 right-4 z-50  text-xl h-8 w-96"></div>
+    <script>
+      function displayErrorToast(message) {
+        const toastContainer = document.getElementById('toastContainer');
+
+        const toast = document.createElement('div');
+        toast.className = 'bg-red-500 text-white py-2 px-4 rounded-md shadow';
+        toast.innerText = message;
+
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+          toast.remove();
+        }, 5000);
+      }
+    </script>
+    {% if  PasswordWrong  %}
+      <script>
+        displayErrorToast("Password should be at list 8 characters with 1 uppercase,1 lowercase character,1 Number and 1 special character");
+      </script>
+    {% endif %}
+        <div class="flex flex-col flex-wrap h-screen w-full rounded-lg">
+          <div class="m-3 p-4 text-light bg-dark rounded-lg h-screen">
+            <div class="bg-slate-700 rounded-lg p-4 h-full">
+              <div class="flex flex-col justify-content-center align-items-center">
+                <div class="card p-12 text-light bg-dark mb-5 w-2/5">
+                  <div>
+                    <i class="fa-brands fa-medium text-8xl"></i>
+                  </div>
+                  <div class="text-3xl m-4 ">
+                    Choose a new password -{{user}}
+                  </div>
+                  <div class="m-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="">
+                          <div class="flex flex-col">
+                            <label class="text-xl ">	
+                                Create a new password that is at least 6 characters long. A strong password has a combination of letters, digits and punctuation marks.
+                            </label>
+                            <input type="password" name="newpassword" value="" class="p-2  mt-2 rounded text-black" required>
+                          </div>
+                        </div>
+                        <div class=" flex">
+                            <div class="flex w-full text-justify text-xl mt-4">
+                            </div>
+                            <div class="flex mt-3 space-x-4">
+                              <button class="px-6 bg-gray-500 hover:bg-gray-600 text-white-100 font-semibold py-2 hover:border-gray-700 rounded text-lg">
+                                <a  href="{% url 'profile' %}">
+                                  Cancle
+                                </a>
+                              </button>
+                              <button class="px-6 bg-blue-500 hover:bg-blue-600 text-gray-100 font-semibold  py-2 hover:border-blue-700 rounded text-lg">
+                                Continue
+                              </button>
+                            </div>
+                        </div>
+                    </form> 
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>  
+    {% endblock content %}

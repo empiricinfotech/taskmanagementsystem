@@ -1,0 +1,12 @@
+asgiref==3.6.0
+async-timeout==4.0.2
+channels==4.0.0
+channels-redis==4.0.0
+Django==4.1.7
+msgpack==1.0.5
+psycopg2-binary==2.9.5
+python-http-client==3.3.7
+redis==4.5.2
+sendgrid==6.9.7
+sqlparse==0.4.3
+starkbank-ecdsa==2.2.0
