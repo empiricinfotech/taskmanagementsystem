@@ -128,7 +128,8 @@ def taskList(request):
             "progress_choice":Task.PROGRESS_CHOICE,
             "tasks":task,
             'page_obj': page_obj,
-            'flag':createdTask
+            'flag':createdTask,
+            'FlagDemo':"createdTask"
         }
         return render(request,'task_list.html',context=context)
     
@@ -137,7 +138,8 @@ def taskList(request):
         if (searchIn is not None) and (searchIn != ''):
             keyword = request.POST['searchIn']
             users = User.objects.all()
-            tasks = Task.objects.filter(Q(task_title__icontains=keyword)|Q(priority__icontains=keyword))
+            task = Task.objects.filter(created_By = request.user)
+            tasks = task.filter(Q(task_title__icontains=keyword)|Q(priority__icontains=keyword))
             p = Paginator(tasks,5) 
             page_number = request.GET.get('page')
             try:
