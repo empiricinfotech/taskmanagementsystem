@@ -92,11 +92,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DATABASES = {
     'default': {
         'ENGINE':'django.db.backends.postgresql',
-        'NAME':'taskapp',
-        'USER':'postgres',
-        'PASSWORD':'0000',
-        'HOST':'localhost',
-        'PORT':'5432',
+        'NAME':os.environ.get('postgres_DB'),
+        'USER':os.environ.get('Postgres_USER'),
+        'PASSWORD':os.environ.get('Postgres_PASSWORD'),
+        'HOST':os.environ.get('Postgres_HOST'),
+        'PORT':os.environ.get('PORT'),
     }
 }
 
